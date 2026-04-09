@@ -68,16 +68,14 @@ program
     if (opts.status) params.status = opts.status as string;
     if (opts.priority) params.priority = opts.priority as string;
     if (opts.tag) params.tag = opts.tag as string;
-    if (opts.last || opts.since || opts.until) {
-      const daysBack = opts.last ? parseLast(opts.last as string) : config.defaults.daysBack;
-      const { since, until } = getDateRange(
-        opts.since as string | undefined,
-        opts.until as string | undefined,
-        daysBack
-      );
-      params.created_at_after = since;
-      params.created_at_before = until;
-    }
+    const daysBack = opts.last ? parseLast(opts.last as string) : config.defaults.daysBack;
+    const { since, until } = getDateRange(
+      opts.since as string | undefined,
+      opts.until as string | undefined,
+      daysBack
+    );
+    params.created_at_after = since;
+    params.created_at_before = until;
 
     // Fetch per space
     const grouped = new Map<string, Task[]>();

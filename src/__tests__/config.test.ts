@@ -8,6 +8,7 @@ describe("parseLast", () => {
   it("parses 'fortnight' as 14", () => expect(parseLast("fortnight")).toBe(14));
   it("parses 'month' as 30", () => expect(parseLast("month")).toBe(30));
   it("parses '10d' as 10", () => expect(parseLast("10d")).toBe(10));
+  it("parses 'Week' case-insensitively as 7", () => expect(parseLast("Week")).toBe(7));
 });
 
 describe("getDateRange", () => {

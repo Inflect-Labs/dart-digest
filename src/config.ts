@@ -32,19 +32,24 @@ export function loadConfig(): Config {
 
 export function saveConfig(config: Config): void {
   fs.mkdirSync(CONFIG_DIR, { recursive: true });
-  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2) + "\n");
 }
 
 export function parseLast(period: string): number {
+  const lower = period.toLowerCase();
   const map: Record<string, number> = {
     day: 1,
+    "1d": 1,
     "3d": 3,
     week: 7,
+    "1w": 7,
+    "2w": 14,
     fortnight: 14,
     month: 30,
+    "30d": 30,
   };
-  if (map[period] !== undefined) return map[period];
-  const match = period.match(/^(\d+)d$/);
+  if (map[lower] !== undefined) return map[lower];
+  const match = lower.match(/^(\d+)d$/);
   if (match) return parseInt(match[1], 10);
   console.error(`Unknown period: "${period}". Use: day, 3d, week, fortnight, month, Nd`);
   process.exit(1);

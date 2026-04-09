@@ -69,7 +69,11 @@ export async function addSpaces(token: string): Promise<void> {
   const dartConfig = await getDartConfig(token);
   let config: Config = { spaces: [], defaults: { daysBack: 7 } };
   if (fs.existsSync(CONFIG_FILE)) {
-    config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
+    try {
+      config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
+    } catch {
+      // ignore malformed config, start fresh
+    }
   }
 
   const available = dartConfig.dartboards.filter((d) => !config.spaces.includes(d));
@@ -91,7 +95,11 @@ export async function addSpaces(token: string): Promise<void> {
 export async function removeSpaces(): Promise<void> {
   let config: Config = { spaces: [], defaults: { daysBack: 7 } };
   if (fs.existsSync(CONFIG_FILE)) {
-    config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
+    try {
+      config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
+    } catch {
+      // ignore malformed config, start fresh
+    }
   }
 
   if (config.spaces.length === 0) {
