@@ -1,4 +1,6 @@
-#!/usr/bin/env tsx
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import { Command } from "commander";
 import { confirm } from "@inquirer/prompts";
 import {
@@ -13,16 +15,22 @@ import {
 import { listTasks, createTask, updateTask, deleteTask } from "./dart.js";
 import { renderTaskList, renderTask } from "./format.js";
 import { runSetup, addSpaces, removeSpaces } from "./setup.js";
+import { checkForUpdate, uninstall } from "./update.js";
 import type { Task, TaskCreate, TaskUpdate } from "./types.js";
 
 loadEnv();
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const { version } = JSON.parse(
+  readFileSync(join(__dirname, "../package.json"), "utf-8")
+) as { version: string };
 
 const program = new Command();
 
 program
   .name("dtd")
   .description("Dart AI task management CLI")
-  .version("0.1.0");
+  .version(version);
 
 // ── setup ──────────────────────────────────────────────────────────────────
 program
@@ -252,5 +260,19 @@ spaces
   .action(async () => {
     await removeSpaces();
   });
+
+// ── uninstall ──────────────────────────────────────────────────────────────
+program
+  .command("uninstall")
+  .description("Remove dtd binary and config directory")
+  .action(async () => {
+    await uninstall();
+  });
+
+// ── update check (skipped for uninstall/setup/spaces to avoid noise) ───────
+const command = process.argv[2];
+if (command !== "uninstall" && command !== "setup" && command !== "spaces") {
+  await checkForUpdate();
+}
 
 program.parse();
