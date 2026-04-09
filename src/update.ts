@@ -5,7 +5,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const REPO = "Inflect-Labs/dart-digest";
-const INSTALL_URL = "https://dart-digest-inflectlabs.vercel.app/install";
+const INSTALL_URL = "https://dart-digest.vercel.app/install";
 
 function currentVersion(): string {
   const __dirname = dirname(fileURLToPath(import.meta.url));
