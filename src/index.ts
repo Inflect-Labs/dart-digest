@@ -7,8 +7,6 @@ import {
   loadEnv,
   requireEnv,
   loadConfig,
-  parseLast,
-  getDateRange,
   matchSpace,
   copyToClipboard,
 } from "./config.js";
@@ -46,12 +44,9 @@ program
   .description("List tasks from tracked spaces")
   .option("--space <name>", "Filter by space (partial match)")
   .option("--assignee <name>", "Filter by assignee name or email")
-  .option("--status <status>", "Filter by status (backlog, doing, done)")
+  .option("--status <status>", "Filter by status (backlog, todo, doing, done)")
   .option("--priority <priority>", "Filter by priority (critical, high, medium, low)")
   .option("--tag <tag>", "Filter by tag")
-  .option("--last <period>", "Time window: day, 3d, week, fortnight, month, Nd")
-  .option("--since <date>", "Start date YYYY-MM-DD (filters by created_at)")
-  .option("--until <date>", "End date YYYY-MM-DD")
   .option("--no-copy", "Skip clipboard copy")
   .action(async (opts) => {
     const token = requireEnv("DART_API_KEY");
@@ -76,14 +71,6 @@ program
     if (opts.status) params.status = opts.status as string;
     if (opts.priority) params.priority = opts.priority as string;
     if (opts.tag) params.tag = opts.tag as string;
-    const daysBack = opts.last ? parseLast(opts.last as string) : config.defaults.daysBack;
-    const { since, until } = getDateRange(
-      opts.since as string | undefined,
-      opts.until as string | undefined,
-      daysBack
-    );
-    params.created_at_after = since;
-    params.created_at_before = until;
 
     // Fetch per space
     const grouped = new Map<string, Task[]>();

@@ -39,14 +39,6 @@ export interface TaskUpdate extends Partial<Omit<TaskCreate, "title">> {
 
 export interface Config {
   spaces: string[];
-  defaults: {
-    daysBack: number;
-  };
-}
-
-export interface DateRange {
-  since: string;
-  until: string;
 }
 
 export interface DartWorkspaceConfig {

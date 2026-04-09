@@ -54,7 +54,7 @@ export async function runSetup(): Promise<void> {
   console.log(`\nLogged in as ${dartConfig.user.name} (${dartConfig.user.email})`);
 
   // Load existing config or start fresh
-  let config: Config = { spaces: [], defaults: { daysBack: 7 } };
+  let config: Config = { spaces: [] };
   if (fs.existsSync(CONFIG_FILE)) {
     try {
       config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
@@ -78,7 +78,7 @@ export async function runSetup(): Promise<void> {
 
 export async function addSpaces(token: string): Promise<void> {
   const dartConfig = await getDartConfig(token);
-  let config: Config = { spaces: [], defaults: { daysBack: 7 } };
+  let config: Config = { spaces: [] };
   if (fs.existsSync(CONFIG_FILE)) {
     try {
       config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
@@ -104,7 +104,7 @@ export async function addSpaces(token: string): Promise<void> {
 }
 
 export async function removeSpaces(): Promise<void> {
-  let config: Config = { spaces: [], defaults: { daysBack: 7 } };
+  let config: Config = { spaces: [] };
   if (fs.existsSync(CONFIG_FILE)) {
     try {
       config = JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
