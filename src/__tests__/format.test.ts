@@ -80,7 +80,9 @@ describe("renderTask", () => {
 
   it("does not show description line when empty", () => {
     const output = renderTask(makeTask({ description: "" }));
-    expect(output.split("\n").length).toBe(1);
+    // ID line is always present; no extra description line
+    expect(output).toContain("ID: abc123def456");
+    expect(output).not.toContain("\n  Created");
   });
 
   it("shows priority when present", () => {

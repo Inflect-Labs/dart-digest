@@ -28,7 +28,7 @@ export function renderTask(task: Task): string {
     task.description?.trim()
       ? `\n  ${task.description.slice(0, 80)}${task.description.length > 80 ? "…" : ""}`
       : "";
-  return `  ${status} ${task.title}${priority}${assignee}${tags}${desc}`;
+  return `  ${status} ${task.title}${priority}${assignee}\n  ID: ${task.id}${tags}${desc}`;
 }
 
 export function renderTaskList(grouped: Map<string, Task[]>): string {
