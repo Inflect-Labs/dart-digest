@@ -25,7 +25,18 @@ export async function runSetup(): Promise<void> {
   }
 
   if (!apiKey) {
-    apiKey = await password({ message: "Enter your Dart API key (dsa_...):" });
+    console.log("  ┌─ Dart API key needed ──────────────────────────────────────┐");
+    console.log("  │");
+    console.log("  │  1. Open this URL in your browser:");
+    console.log("  │     https://app.dartai.com/settings/api");
+    console.log("  │");
+    console.log("  │  2. Click \"Create API key\", give it a name (e.g. dtd),");
+    console.log("  │     and copy the key (starts with dsa_).");
+    console.log("  │");
+    console.log("  └────────────────────────────────────────────────────────────┘\n");
+
+    apiKey = await password({ message: "  Dart API key:", mask: "*" });
+    apiKey = apiKey.trim();
   }
 
   // Validate API key
