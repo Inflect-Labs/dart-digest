@@ -28,7 +28,7 @@ export async function runSetup(): Promise<void> {
     console.log("  ┌─ Dart API key needed ──────────────────────────────────────┐");
     console.log("  │");
     console.log("  │  1. Open this URL in your browser:");
-    console.log("  │     https://app.dartai.com/settings/api");
+    console.log("  │     https://app.dartai.com/home/api?settings=cli");
     console.log("  │");
     console.log("  │  2. Click \"Create API key\", give it a name (e.g. dtd),");
     console.log("  │     and copy the key (starts with dsa_).");
