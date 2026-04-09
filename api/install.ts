@@ -69,7 +69,7 @@ fi
 echo ""
 echo "dtd installed successfully."
 echo "Run 'dtd setup' to configure your Dart AI API key."
-\`;
+`;
 
 export default function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Content-Type", "text/plain");
