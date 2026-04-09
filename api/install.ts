@@ -1,5 +1,3 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-
 const INSTALL_SCRIPT = `#!/bin/sh
 set -e
 
@@ -87,8 +85,11 @@ echo "dtd installed successfully."
 echo "Run 'dtd setup' to configure your Dart AI API key."
 `;
 
-export function GET(req: IncomingMessage, res: ServerResponse) {
-  res.setHeader("Content-Type", "text/plain");
-  res.setHeader("Cache-Control", "no-store");
-  res.end(INSTALL_SCRIPT);
+export function GET(): Response {
+  return new Response(INSTALL_SCRIPT, {
+    headers: {
+      "Content-Type": "text/plain",
+      "Cache-Control": "no-store",
+    },
+  });
 }
