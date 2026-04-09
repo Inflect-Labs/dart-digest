@@ -1,6 +1,6 @@
 {
   "name": "dart-digest",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI for reading and managing Dart AI tasks",
   "type": "module",
   "bin": {
