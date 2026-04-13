@@ -10,7 +10,7 @@ import {
   matchSpace,
   copyToClipboard,
 } from "./config.js";
-import { listTasks, createTask, updateTask, deleteTask } from "./dart.js";
+import { listTasks, countTasks, createTask, updateTask, deleteTask } from "./dart.js";
 import { renderTaskList, renderTask } from "./format.js";
 import { runSetup, addSpaces, removeSpaces } from "./setup.js";
 import { checkForUpdate, uninstall } from "./update.js";
@@ -44,7 +44,7 @@ program
   .description("List tasks from tracked spaces")
   .option("--space <name>", "Filter by space (partial match)")
   .option("--assignee <name>", "Filter by assignee name or email")
-  .option("--status <status>", "Filter by status (backlog, todo, doing, done)")
+  .option("--status <status>", "Filter by status (backlog, todo, doing, done, archived)")
   .option("--priority <priority>", "Filter by priority (critical, high, medium, low)")
   .option("--tag <tag>", "Filter by tag")
   .option("--no-copy", "Skip clipboard copy")
@@ -187,11 +187,81 @@ program
 
 // ── delete ─────────────────────────────────────────────────────────────────
 program
-  .command("delete <id>")
-  .description("Move a task to trash")
+  .command("delete [id]")
+  .description("Move a task to trash. Use --all with filters to bulk delete.")
   .option("--yes", "Skip confirmation prompt")
-  .action(async (id: string, opts) => {
+  .option("--all", "Delete all tasks matching the given filters")
+  .option("--space <name>", "Filter by space (partial match, use with --all)")
+  .option("--status <status>", "Filter by status (use with --all)")
+  .option("--assignee <name>", "Filter by assignee (use with --all)")
+  .option("--priority <priority>", "Filter by priority (use with --all)")
+  .option("--tag <tag>", "Filter by tag (use with --all)")
+  .action(async (id: string | undefined, opts) => {
     const token = requireEnv("DART_API_KEY");
+
+    if (opts.all) {
+      const config = loadConfig();
+
+      let spaces = config.spaces;
+      if (opts.space) {
+        const matched = matchSpace(spaces, opts.space as string);
+        if (!matched) {
+          console.error(`Space not found: "${opts.space}". Tracked: ${spaces.join(", ")}`);
+          process.exit(1);
+        }
+        spaces = [matched];
+      }
+
+      const params: Record<string, string> = {};
+      if (opts.status) params.status = opts.status as string;
+      if (opts.assignee) params.assignee = opts.assignee as string;
+      if (opts.priority) params.priority = opts.priority as string;
+      if (opts.tag) params.tag = opts.tag as string;
+
+      const grouped = new Map<string, Task[]>();
+      for (const space of spaces) {
+        const tasks = await listTasks({ dartboard: space, ...params }, token);
+        if (tasks.length > 0) grouped.set(space, tasks);
+      }
+
+      const total = [...grouped.values()].reduce((sum, t) => sum + t.length, 0);
+      if (total === 0) {
+        console.log("No tasks found matching filters.");
+        return;
+      }
+
+      console.log(`\nFound ${total} task(s) to delete:\n`);
+      for (const [space, tasks] of grouped) {
+        console.log(`  ${space}: ${tasks.length} task(s)`);
+      }
+
+      if (!opts.yes) {
+        const ok = await confirm({
+          message: `Move all ${total} task(s) to trash?`,
+          default: false,
+        });
+        if (!ok) {
+          console.log("Cancelled.");
+          return;
+        }
+      }
+
+      let deleted = 0;
+      for (const tasks of grouped.values()) {
+        for (const task of tasks) {
+          await deleteTask(task.id, token);
+          deleted++;
+          process.stdout.write(`\r  Deleted ${deleted}/${total}...`);
+        }
+      }
+      console.log(`\n\nDone. Moved ${deleted} task(s) to trash.\n`);
+      return;
+    }
+
+    if (!id) {
+      console.error("Provide a task ID, or use --all with filters to bulk delete.");
+      process.exit(1);
+    }
 
     if (!opts.yes) {
       const ok = await confirm({
@@ -226,10 +296,12 @@ spaces
     }
 
     console.log("\nTracked spaces:\n");
-    for (const space of config.spaces) {
-      const tasks = await listTasks({ dartboard: space }, token);
-      console.log(`  ${space}  (${tasks.length} tasks)`);
-    }
+    const counts = await Promise.all(
+      config.spaces.map((space) => countTasks({ dartboard: space }, token))
+    );
+    config.spaces.forEach((space, i) => {
+      console.log(`  ${space}  (${counts[i]} tasks)`);
+    });
     console.log();
   });
 

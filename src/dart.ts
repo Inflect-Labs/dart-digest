@@ -32,6 +32,15 @@ export async function getDartConfig(token: string): Promise<DartWorkspaceConfig>
   return dartFetch<DartWorkspaceConfig>(`${BASE}/config`, {}, token);
 }
 
+export async function countTasks(
+  params: Record<string, string>,
+  token: string
+): Promise<number> {
+  const query = new URLSearchParams({ limit: "1", ...params });
+  const data = await dartFetch<PaginatedTasks>(`${BASE}/tasks/list?${query}`, {}, token);
+  return data.count;
+}
+
 export async function listTasks(
   params: Record<string, string>,
   token: string
